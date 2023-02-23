@@ -60,7 +60,7 @@ export default function AddExpense({ open, onClose, data:modalData }) {
     return (
         <Dialog onClose={handleClose} open={open}>
             <Container maxWidth="lg">
-                <h3 className='expense-form-title'>Add Expense</h3>
+                <h3 className='expense-form-title'>{modalData.action =="ADD"?"Add":"Update"} Expense</h3>
                 <form className='expense-form' ref={formRef}>
                     <TextField className='expense-form-items' type="text" variant="outlined" name='name' label="Name" required />
                     <TextField className='expense-form-items' type="text" variant="outlined" name='desc' label="Description" required />
@@ -81,7 +81,7 @@ export default function AddExpense({ open, onClose, data:modalData }) {
                         </Select>
                     </FormControl>
                     {/* <TextField type="file" variant="outlined" name='img' label="img" required/> */}
-                    <Button className='expense-form-items' type='submit' color='primary' variant='contained' onClick={handleAddExpense}>Add</Button>
+                    <Button className='expense-form-items' type='submit' color='primary' variant='contained' onClick={handleAddExpense}>{modalData.action =="ADD"?"Add":"Update"}</Button>
                 </form>
             </Container>
         </Dialog>

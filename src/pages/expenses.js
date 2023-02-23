@@ -79,12 +79,19 @@ export default function Expenses() {
         })
         handleClickOpen();
     }
+    const handleAdd = () => {
+        setModalData({
+            action:"ADD",
+            url:baseUrl+"/expenses/add",
+        })
+        handleClickOpen();
+    }
     useEffect(() => {
         fetchExpenses();
     }, [open])
     return (
         <>
-            <Button variant="contained" onClick={handleClickOpen}>Add Expense</Button>
+            <Button variant="contained" onClick={handleAdd}>Add Expense</Button>
             <AddExpense open={open} onClose={handleClose} data={modalData}/>
             <div style={{ height: 400, width: '100%' }}>
                 <DataGrid
