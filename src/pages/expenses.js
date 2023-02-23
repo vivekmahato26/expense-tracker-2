@@ -54,6 +54,20 @@ export default function Expenses() {
             console.log(error);
         }
     }
+    const handleDelete = async () => {
+        try {
+            const loginToken = localStorage.getItem("token");
+            const deleteUrl = baseUrl + "/expenses/delete/"+selected[0]._id;
+            const {data} = await axios.delete(deleteUrl, {
+                headers: {
+                    Authorization: "Bearer "+ loginToken
+                }
+            })
+            if(typeof data === "object") fetchExpenses();
+        } catch (error) {
+            console.log(error)
+        }
+    }
     useEffect(() => {
         fetchExpenses();
     }, [open])
@@ -86,7 +100,7 @@ export default function Expenses() {
                 }}
             >
                 <MenuItem onClick={handleCloseMenu}>Edit  </MenuItem>
-                <MenuItem onClick={handleCloseMenu}>Delete </MenuItem>
+                <MenuItem onClick={handleDelete}>Delete </MenuItem>
             </Menu>
         </>
     )
