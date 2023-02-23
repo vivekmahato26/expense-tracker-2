@@ -1,39 +1,74 @@
-import { FormGroup, TextField, FormControl, InputLabel, Select, MenuItem, Paper, Button } from '@mui/material'
+import { FormGroup, TextField, FormControl, InputLabel, Select, MenuItem, Paper, Button,Dialog } from '@mui/material'
 import { Container } from '@mui/system'
-import React, { useState } from 'react'
-
+import React, { useState, useRef } from 'react'
+import axios from "axios";
 import "../styles/addExpense.scss";
+import { baseUrl } from '../utils/constants';
 
-export default function AddExpense() {
+export default function AddExpense({ open, onClose }) {
 
-    const [expenseType,setExpenseType] = useState("");
+    const [expenseType, setExpenseType] = useState("");
+    const [expenseData, setExpenseData] = useState("");
+    const formRef = useRef();
+    const handleAddExpense = async (event) => {
+        event.preventDefault();
+        const form = formRef.current;
+        const data = {};
+        data[form.name.name] = form.name.value;
+        data[form.desc.name] = form.desc.value;
+        data[form.transactionDetails.name] = form.transactionDetails.value;
+        data[form.transactionAccount.name] = form.transactionAccount.value;
+        data[form.amount.name] = form.amount.value;
+        data["type"] = expenseType;
+        // console.log(data);
+        const url = baseUrl + "/expenses/add";
+        try {
+            const loginToken = localStorage.getItem("token");
+            const { data: postData } = await axios.post(url, data, {
+                headers: {
+                    Authorization: "Bearer " + loginToken
+                }
+            })
+    
+            console.log(postData);
+            setExpenseData(postData);
+            onClose(false);
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    const handleClose = () => {
+        onClose(false);
+    };
 
 
     return (
-        <Container maxWidth="lg">
-            <h3 className='expense-form-title'>Add Expense</h3>
-            <FormGroup className='expense-form'>
-                <TextField className='expense-form-items' type="text" variant="outlined" name='name' label="Name" required />
-                <TextField className='expense-form-items' type="text" variant="outlined" name='desc' label="Description" required />
-                <TextField className='expense-form-items' type="text" variant="outlined" name='transactionDetails' label="Details" required />
-                <TextField className='expense-form-items' type="text" variant="outlined" name='transactionAccount' label="Account" required />
-                <TextField className='expense-form-items' type="text" variant="outlined" name='amount' label="amount" required />
-                <FormControl fullWidth>
-                    <InputLabel id="demo-simple-select-label">Type</InputLabel>
-                    <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        value={expenseType}
-                        label="Age"
-                        onChange={(e)=>setExpenseType(e.target.value)}
-                    >
-                        <MenuItem value={"income"}>Income</MenuItem>
-                        <MenuItem value={"expense"}>Expense</MenuItem>
-                    </Select>
-                </FormControl>
-                {/* <TextField type="file" variant="outlined" name='img' label="img" required/> */}
-                <Button className='expense-form-items' type='submit' color='primary' variant='contained'>Add</Button>
-            </FormGroup>
-        </Container>
+        <Dialog onClose={handleClose} open={open}>
+            <Container maxWidth="lg">
+                <h3 className='expense-form-title'>Add Expense</h3>
+                <form className='expense-form' ref={formRef}>
+                    <TextField className='expense-form-items' type="text" variant="outlined" name='name' label="Name" required />
+                    <TextField className='expense-form-items' type="text" variant="outlined" name='desc' label="Description" required />
+                    <TextField className='expense-form-items' type="text" variant="outlined" name='transactionDetails' label="Details" required />
+                    <TextField className='expense-form-items' type="text" variant="outlined" name='transactionAccount' label="Account" required />
+                    <TextField className='expense-form-items' type="text" variant="outlined" name='amount' label="amount" required />
+                    <FormControl fullWidth>
+                        <InputLabel id="demo-simple-select-label">Type</InputLabel>
+                        <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            value={expenseType}
+                            label="Age"
+                            onChange={(e) => setExpenseType(e.target.value)}
+                        >
+                            <MenuItem value={"income"}>Income</MenuItem>
+                            <MenuItem value={"expense"}>Expense</MenuItem>
+                        </Select>
+                    </FormControl>
+                    {/* <TextField type="file" variant="outlined" name='img' label="img" required/> */}
+                    <Button className='expense-form-items' type='submit' color='primary' variant='contained' onClick={handleAddExpense}>Add</Button>
+                </form>
+            </Container>
+        </Dialog>
     )
 }
