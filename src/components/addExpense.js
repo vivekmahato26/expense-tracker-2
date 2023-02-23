@@ -5,7 +5,7 @@ import axios from "axios";
 import "../styles/addExpense.scss";
 import { baseUrl } from '../utils/constants';
 
-export default function AddExpense({ open, onClose, data }) {
+export default function AddExpense({ open, onClose, data:modalData }) {
 
     const [expenseType, setExpenseType] = useState("");
     const [expenseData, setExpenseData] = useState("");
@@ -20,11 +20,11 @@ export default function AddExpense({ open, onClose, data }) {
         data[form.transactionAccount.name] = form.transactionAccount.value;
         data[form.amount.name] = form.amount.value;
         data["type"] = expenseType;
-        // console.log(data);
-        const url = data.url;
+        console.log(data);
+        const url = modalData.url;
         try {
             const loginToken = localStorage.getItem("token");
-            switch(data.action) {
+            switch(modalData.action) {
                 case "ADD" : const { data: postData } = await axios.post(url, data, {
                     headers: {
                         Authorization: "Bearer " + loginToken

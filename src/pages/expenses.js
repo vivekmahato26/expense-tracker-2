@@ -75,7 +75,7 @@ export default function Expenses() {
     const handleEdit = () => {
         setModalData({
             action:"EDIT",
-            url:"/expenses/update/"+selected[0]._id,
+            url:baseUrl+"/expenses/update/"+selected[0]._id,
         })
         handleClickOpen();
     }
