@@ -3,37 +3,91 @@ import React, { useEffect, useState } from 'react'
 import AddExpense from '../components/addExpense';
 import { baseUrl } from '../utils/constants';
 import axios from 'axios';
+import { DataGrid } from '@mui/x-data-grid';
+import { HiOutlineMenuAlt1, } from "react-icons/hi"
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 
 export default function Expenses() {
+    const columns = [
+        { field: 'id', headerName: 'ID', width: 70, sortable: false },
+        { field: 'name', headerName: 'Expense Name', width: 130, sortable: false },
+        { field: 'desc', headerName: 'Description', width: 130, sortable: false },
+        { field: 'amount', headerName: 'Amount', type: 'number', width: 90, sortable: true },
+        { field: 'transactionAccount', headerName: 'Transaction Account', width: 90, sortable: false },
+        { field: 'transactionDetails', headerName: 'Transaction Details', width: 90, sortable: false },
+        { field: 'type', headerName: 'Expense/Income', width: 90, sortable: true, },
+        { field: 'creator', headerName: 'UserId', width: 90, sortable: false },
+        { field: 'createdAt', headerName: 'Created', width: 90, sortable: true, },
+        { field: 'updatedAt', headerName: 'Updated', width: 90, sortable: true, },
+        { field: 'edit', headerName: 'Edit', width: 90, renderCell: () => <HiOutlineMenuAlt1 onClick={handleClick} /> },
+    ];
+    const [expenses, setExpenses] = useState([]);
     const [open, setOpen] = useState(false);
-    const handleClickOpen = () => {
+    const [selected, setSelected] = useState([]);
+    const handleClickOpen = (event) => {
         setOpen(true);
     };
 
     const handleClose = (value) => {
         setOpen(false);
     };
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const openMenu = Boolean(anchorEl);
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleCloseMenu = () => {
+        setAnchorEl(null);
+    };
     const fetchExpenses = async () => {
         try {
             const url = baseUrl + "/expenses";
             const loginToken = localStorage.getItem("token");
-            const {data} = await axios.get(url,{
+            const { data } = await axios.get(url, {
                 headers: {
-                    Authorization: "Bearer "+ loginToken
+                    Authorization: "Bearer " + loginToken
                 }
             });
-            console.log(data);
+            setExpenses(data.map(e => ({ ...e, id: e._id })));
         } catch (error) {
             console.log(error);
         }
     }
-    useEffect(()=>{
+    useEffect(() => {
         fetchExpenses();
-    },[open])
+    }, [open])
     return (
         <>
             <Button variant="contained" onClick={handleClickOpen}>Add Expense</Button>
             <AddExpense open={open} onClose={handleClose} />
+            <div style={{ height: 400, width: '100%' }}>
+                <DataGrid
+                    rows={expenses}
+                    columns={columns}
+                    pageSize={5}
+                    rowsPerPageOptions={[5]}
+                    onSelectionModelChange={(ids) => {
+                        const selectedIDs = new Set(ids);
+                        const selectedRowData = expenses.filter((row) =>
+                            selectedIDs.has(row.id.toString())
+                            );
+                            setSelected(selectedRowData);
+                      }}
+                />
+            </div>
+            <Menu
+                id="basic-menu"
+                anchorEl={anchorEl}
+                open={openMenu}
+                onClose={handleCloseMenu}
+                MenuListProps={{
+                    'aria-labelledby': 'basic-button',
+                }}
+            >
+                <MenuItem onClick={handleCloseMenu}>Edit  </MenuItem>
+                <MenuItem onClick={handleCloseMenu}>Delete </MenuItem>
+            </Menu>
         </>
     )
 }
