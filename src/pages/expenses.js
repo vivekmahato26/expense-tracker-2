@@ -25,6 +25,10 @@ export default function Expenses() {
     const [expenses, setExpenses] = useState([]);
     const [open, setOpen] = useState(false);
     const [selected, setSelected] = useState([]);
+    const [modalData,setModalData] = useState({
+        action:"ADD",
+        url:"/expenses/add",
+    })
     const handleClickOpen = (event) => {
         setOpen(true);
     };
@@ -68,13 +72,20 @@ export default function Expenses() {
             console.log(error)
         }
     }
+    const handleEdit = () => {
+        setModalData({
+            action:"EDIT",
+            url:"/expenses/update/"+selected[0]._id,
+        })
+        handleClickOpen();
+    }
     useEffect(() => {
         fetchExpenses();
     }, [open])
     return (
         <>
             <Button variant="contained" onClick={handleClickOpen}>Add Expense</Button>
-            <AddExpense open={open} onClose={handleClose} />
+            <AddExpense open={open} onClose={handleClose} data={modalData}/>
             <div style={{ height: 400, width: '100%' }}>
                 <DataGrid
                     rows={expenses}
@@ -99,7 +110,7 @@ export default function Expenses() {
                     'aria-labelledby': 'basic-button',
                 }}
             >
-                <MenuItem onClick={handleCloseMenu}>Edit  </MenuItem>
+                <MenuItem onClick={handleEdit}>Edit  </MenuItem>
                 <MenuItem onClick={handleDelete}>Delete </MenuItem>
             </Menu>
         </>

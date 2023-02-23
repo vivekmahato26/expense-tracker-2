@@ -5,7 +5,7 @@ import axios from "axios";
 import "../styles/addExpense.scss";
 import { baseUrl } from '../utils/constants';
 
-export default function AddExpense({ open, onClose }) {
+export default function AddExpense({ open, onClose, data }) {
 
     const [expenseType, setExpenseType] = useState("");
     const [expenseData, setExpenseData] = useState("");
@@ -21,18 +21,33 @@ export default function AddExpense({ open, onClose }) {
         data[form.amount.name] = form.amount.value;
         data["type"] = expenseType;
         // console.log(data);
-        const url = baseUrl + "/expenses/add";
+        const url = data.url;
         try {
             const loginToken = localStorage.getItem("token");
-            const { data: postData } = await axios.post(url, data, {
-                headers: {
-                    Authorization: "Bearer " + loginToken
-                }
-            })
-    
-            console.log(postData);
-            setExpenseData(postData);
-            onClose(false);
+            switch(data.action) {
+                case "ADD" : const { data: postData } = await axios.post(url, data, {
+                    headers: {
+                        Authorization: "Bearer " + loginToken
+                    }
+                })
+        
+                console.log(postData);
+                setExpenseData(postData);
+                onClose(false);
+                break;
+                case "EDIT": const { data: editData } = await axios.put(url, data, {
+                    headers: {
+                        Authorization: "Bearer " + loginToken
+                    }
+                })
+        
+                console.log(editData);
+                setExpenseData(editData);
+                onClose(false);
+                break;
+                default: break;
+            }
+            
         } catch (error) {
             console.log(error)
         }
