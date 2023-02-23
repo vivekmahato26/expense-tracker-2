@@ -27,7 +27,7 @@ export default function Expenses() {
     const [selected, setSelected] = useState([]);
     const [modalData,setModalData] = useState({
         action:"ADD",
-        url:"/expenses/add",
+        url:baseUrl+"/expenses/add",
     })
     const handleClickOpen = (event) => {
         setOpen(true);
